@@ -57,9 +57,17 @@ const AllBloodDonationRequests = () => {
   };
 
   return (
-    <div>
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-        <h1 className="font-heading text-2xl font-bold text-gray-800 dark:text-gray-100">All Blood Donation Requests</h1>
+    <div className="max-w-6xl space-y-6">
+      <div>
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
+          All <span className="text-primary">Requests</span>
+        </h1>
+        <p className="text-gray-500 dark:text-gray-400 mt-2">
+          View, edit, and manage all blood donation requests.
+        </p>
+      </div>
+
+      <div className="flex flex-col sm:flex-row sm:items-center justify-end gap-4">
         <select
           value={statusFilter}
           onChange={(e) => { setStatusFilter(e.target.value); setPage(1); }}
@@ -72,7 +80,7 @@ const AllBloodDonationRequests = () => {
         </select>
       </div>
 
-      <div className="card">
+      <div className="bg-white dark:bg-gray-900 rounded-[28px] border border-gray-100 dark:border-gray-800 shadow-[0_8px_30px_rgba(0,0,0,0.06)] p-6">
         {loading ? (
           <LoadingSpinner />
         ) : (

@@ -41,6 +41,10 @@ const DonationRequestDetails = () => {
   if (loading) return <LoadingSpinner fullScreen />;
   if (!request) return <p className="text-center py-20 text-muted">Request not found.</p>;
 
+  const isOwnRequest =
+    request.requesterId?.toString() === user?._id?.toString() ||
+    request.requesterEmail === user?.email;
+
   return (
     <div className="max-w-5xl mx-auto px-4 py-12">
       <RequestDetailsHeading />
@@ -48,7 +52,8 @@ const DonationRequestDetails = () => {
       <RequestDetailCard
         request={request}
         showDonate
-        onDonate={() => setModalOpen(true)}
+        donateDisabled={isOwnRequest}
+        onDonate={() => !isOwnRequest && setModalOpen(true)}
       />
 
       <AnimatePresence>

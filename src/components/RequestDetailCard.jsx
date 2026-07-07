@@ -23,6 +23,8 @@ const RequestDetailCard = ({
   request,
   showDonate = false,
   onDonate,
+  donateDisabled = false,
+  donateDisabledMessage = 'You cannot donate to your own request',
   actionLabel = 'View Details',
   actionTo,
   onAction,
@@ -187,14 +189,25 @@ const RequestDetailCard = ({
             )}
 
             {showDonate && request.donationStatus === 'pending' ? (
-              <button
-                type="button"
-                onClick={onDonate}
-                className="inline-flex items-center gap-3 bg-primary hover:bg-primary-dark text-white font-semibold px-8 py-3.5 rounded-2xl transition-all shadow-lg shadow-primary/25 hover:shadow-primary/40"
-              >
-                <FaHeart />
-                Donate Now
-              </button>
+              <div className="flex flex-col items-end gap-2">
+                {donateDisabled && (
+                  <p className="text-sm text-gray-500 dark:text-gray-400">{donateDisabledMessage}</p>
+                )}
+                <button
+                  type="button"
+                  onClick={donateDisabled ? undefined : onDonate}
+                  disabled={donateDisabled}
+                  title={donateDisabled ? donateDisabledMessage : undefined}
+                  className={`inline-flex items-center gap-3 font-semibold px-8 py-3.5 rounded-2xl transition-all ${
+                    donateDisabled
+                      ? 'bg-gray-300 dark:bg-gray-700 text-gray-500 dark:text-gray-400 cursor-not-allowed shadow-none'
+                      : 'bg-primary hover:bg-primary-dark text-white shadow-lg shadow-primary/25 hover:shadow-primary/40'
+                  }`}
+                >
+                  <FaHeart />
+                  Donate Now
+                </button>
+              </div>
             ) : null}
 
             {actionTo && !showOwnerActions ? (

@@ -22,6 +22,15 @@ export const getStatusClass = (status) => {
   return map[status] || '';
 };
 
+export const getRoleClass = (role) => {
+  const map = {
+    admin: 'role-admin',
+    volunteer: 'role-volunteer',
+    donor: 'role-donor',
+  };
+  return map[role] || 'role-donor';
+};
+
 const IMGBB_PLACEHOLDER_KEYS = new Set([
   'your_imgbb_api_key_here',
   'your_imgbb_api_key',
