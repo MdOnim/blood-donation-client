@@ -3,7 +3,8 @@ import { useParams } from 'react-router-dom';
 import api from '../api/axios';
 import { useAuth } from '../context/AuthContext';
 import LoadingSpinner from '../components/LoadingSpinner';
-import { formatStatus, getStatusClass } from '../utils/constants';
+import RequestDetailCard from '../components/RequestDetailCard';
+import RequestDetailsHeading from '../components/RequestDetailsHeading';
 import toast from 'react-hot-toast';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -40,47 +41,15 @@ const DonationRequestDetails = () => {
   if (loading) return <LoadingSpinner fullScreen />;
   if (!request) return <p className="text-center py-20 text-muted">Request not found.</p>;
 
-  const details = [
-    { label: 'Requester Name', value: request.requesterName },
-    { label: 'Requester Email', value: request.requesterEmail },
-    { label: 'Recipient Name', value: request.recipientName },
-    { label: 'Recipient District', value: request.recipientDistrict },
-    { label: 'Recipient Upazila', value: request.recipientUpazila },
-    { label: 'Hospital Name', value: request.hospitalName },
-    { label: 'Full Address', value: request.fullAddress },
-    { label: 'Blood Group', value: request.bloodGroup },
-    { label: 'Donation Date', value: request.donationDate },
-    { label: 'Donation Time', value: request.donationTime },
-    { label: 'Request Message', value: request.requestMessage },
-    { label: 'Status', value: formatStatus(request.donationStatus), isStatus: true },
-  ];
-
   return (
-    <div className="max-w-3xl mx-auto px-4 py-12">
-      <div className="card">
-        <h1 className="font-heading text-2xl font-bold text-gray-800 dark:text-gray-100 mb-6">
-          Donation Request Details
-        </h1>
+    <div className="max-w-5xl mx-auto px-4 py-12">
+      <RequestDetailsHeading />
 
-        <div className="space-y-4">
-          {details.map((item) => (
-            <div key={item.label} className="flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-4 py-3 border-b border-gray-50 dark:border-gray-800">
-              <span className="text-sm font-semibold text-gray-600 dark:text-gray-400 sm:w-44 shrink-0">{item.label}</span>
-              {item.isStatus ? (
-                <span className={getStatusClass(request.donationStatus)}>{item.value}</span>
-              ) : (
-                <span className="text-gray-800 dark:text-gray-200">{item.value}</span>
-              )}
-            </div>
-          ))}
-        </div>
-
-        {request.donationStatus === 'pending' && (
-          <button onClick={() => setModalOpen(true)} className="btn-primary w-full mt-8">
-            Donate Blood
-          </button>
-        )}
-      </div>
+      <RequestDetailCard
+        request={request}
+        showDonate
+        onDonate={() => setModalOpen(true)}
+      />
 
       <AnimatePresence>
         {modalOpen && (

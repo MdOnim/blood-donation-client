@@ -35,22 +35,15 @@ const AdminHome = () => {
   ];
 
   return (
-    <div>
-      <div className="card mb-8 bg-gradient-to-r from-primary/5 to-secondary/5 border-primary/10">
-        <h1 className="font-heading text-2xl md:text-3xl font-bold text-gray-800">
-          Welcome, <span className="text-primary">{user?.name}</span>!
-        </h1>
-        <p className="text-muted mt-2">Here&apos;s an overview of the platform.</p>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+    <div className="space-y-8">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {cards.map((card, i) => (
           <motion.div
             key={card.title}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.1 }}
-            className="card flex items-center gap-4"
+            className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm p-6 flex items-center gap-4"
           >
             <div className={`w-14 h-14 ${card.color} rounded-2xl flex items-center justify-center`}>
               <card.icon className="text-white text-xl" />
@@ -63,7 +56,7 @@ const AdminHome = () => {
         ))}
       </div>
 
-      <div className="card">
+      <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm p-6">
         <h2 className="font-heading text-xl font-bold text-gray-800 dark:text-gray-100 mb-6">Platform Overview</h2>
         <ResponsiveContainer width="100%" height={300}>
           <BarChart data={chartData}>

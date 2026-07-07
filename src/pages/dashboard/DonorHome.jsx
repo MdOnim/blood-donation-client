@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../../api/axios';
-import { useAuth } from '../../context/AuthContext';
 import DonationTable from '../../components/DonationTable';
+import RequestDetailCard from '../../components/RequestDetailCard';
+import RequestDetailsHeading from '../../components/RequestDetailsHeading';
 import ConfirmModal from '../../components/ConfirmModal';
 import LoadingSpinner from '../../components/LoadingSpinner';
-import toast from 'react-hot-toast';
+import { useAuth } from '../../context/AuthContext';
+import { FaSyringe } from 'react-icons/fa';
 
 const DonorHome = () => {
   const { user } = useAuth();
@@ -47,18 +49,57 @@ const DonorHome = () => {
 
   if (loading) return <LoadingSpinner />;
 
-  return (
-    <div>
-      <div className="card mb-8 bg-gradient-to-r from-primary/5 to-secondary/5 border-primary/10">
-        <h1 className="font-heading text-2xl md:text-3xl font-bold text-gray-800">
-          Welcome, <span className="text-primary">{user?.name}</span>!
-        </h1>
-        <p className="text-muted mt-2">Manage your donation requests and help save lives.</p>
-      </div>
+  const featuredRequest = recentRequests[0];
 
-      {recentRequests.length > 0 && (
-        <div className="card">
-          <h2 className="font-heading text-xl font-bold text-gray-800 dark:text-gray-100 mb-4">
+  return (
+    <div className="space-y-8">
+      {featuredRequest ? (
+        <section className="max-w-5xl mx-auto">
+          <RequestDetailsHeading />
+
+          <RequestDetailCard
+            request={featuredRequest}
+            showOwnerActions
+            editTo={`/dashboard/edit-donation-request/${featuredRequest._id}`}
+            onDelete={() => setDeleteTarget(featuredRequest)}
+          />
+        </section>
+      ) : (
+        <section className="max-w-3xl">
+          <div className="mb-8">
+            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-gray-100">
+              Hello, <span className="text-primary capitalize">{user?.role}!</span>
+            </h2>
+            <p className="text-gray-500 dark:text-gray-400 mt-2">
+              Manage your activities and help save lives today.
+            </p>
+          </div>
+
+          <div className="bg-white dark:bg-gray-900 rounded-[28px] border border-gray-100 dark:border-gray-800 shadow-[0_8px_30px_rgba(0,0,0,0.06)] p-12 sm:p-16 text-center">
+            <FaSyringe className="mx-auto text-5xl text-gray-300 dark:text-gray-600 mb-6" />
+            <h3 className="text-xl font-bold text-gray-700 dark:text-gray-300">No requests yet</h3>
+          </div>
+
+          <div className="flex flex-wrap justify-center gap-4 mt-8">
+            <Link
+              to="/dashboard/create-donation-request"
+              className="inline-flex items-center justify-center bg-gray-900 hover:bg-gray-800 dark:bg-gray-100 dark:hover:bg-white dark:text-gray-900 text-white font-bold tracking-wider uppercase px-8 py-3.5 rounded-2xl shadow-lg transition-all"
+            >
+              Create Request
+            </Link>
+            <Link
+              to="/dashboard/my-donation-requests"
+              className="inline-flex items-center justify-center bg-gray-900 hover:bg-gray-800 dark:bg-gray-100 dark:hover:bg-white dark:text-gray-900 text-white font-bold tracking-wider uppercase px-8 py-3.5 rounded-2xl shadow-lg transition-all"
+            >
+              View Requests
+            </Link>
+          </div>
+        </section>
+      )}
+
+      {recentRequests.length > 1 && (
+        <section className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm p-6">
+          <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-4">
             Recent Donation Requests
           </h2>
           <DonationTable
@@ -71,7 +112,7 @@ const DonorHome = () => {
               View My All Requests
             </Link>
           </div>
-        </div>
+        </section>
       )}
 
       <ConfirmModal

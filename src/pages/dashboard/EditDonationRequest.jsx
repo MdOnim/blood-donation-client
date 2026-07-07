@@ -9,11 +9,13 @@ import toast from 'react-hot-toast';
 const EditDonationRequest = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { districts, upazilas, fetchUpazilas } = useLocations();
+  const { divisions, districts, upazilas, fetchDistrictsByDivision, fetchUpazilas, setUpazilas } =
+    useLocations();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState({
     recipientName: '',
+    recipientDivision: '',
     recipientDistrict: '',
     recipientUpazila: '',
     hospitalName: '',
@@ -25,39 +27,71 @@ const EditDonationRequest = () => {
   });
 
   useEffect(() => {
-    api.get(`/donations/${id}`).then((res) => {
-      const r = res.data;
-      setForm({
-        recipientName: r.recipientName,
-        recipientDistrict: r.recipientDistrict,
-        recipientUpazila: r.recipientUpazila,
-        hospitalName: r.hospitalName,
-        fullAddress: r.fullAddress,
-        bloodGroup: r.bloodGroup,
-        donationDate: r.donationDate,
-        donationTime: r.donationTime,
-        requestMessage: r.requestMessage,
-      });
-      fetchUpazilas(r.recipientDistrict);
-      setLoading(false);
-    });
+    const loadRequest = async () => {
+      try {
+        const [requestRes, districtsRes] = await Promise.all([
+          api.get(`/donations/${id}`),
+          api.get('/locations/districts'),
+        ]);
+        const r = requestRes.data;
+        const district = districtsRes.data.find((d) => d.name === r.recipientDistrict);
+        const divisionId = district?.division_id || '';
+
+        if (divisionId) {
+          await fetchDistrictsByDivision(divisionId);
+        }
+        await fetchUpazilas(r.recipientDistrict);
+
+        setForm({
+          recipientName: r.recipientName,
+          recipientDivision: divisionId,
+          recipientDistrict: r.recipientDistrict,
+          recipientUpazila: r.recipientUpazila,
+          hospitalName: r.hospitalName,
+          fullAddress: r.fullAddress,
+          bloodGroup: r.bloodGroup,
+          donationDate: r.donationDate,
+          donationTime: r.donationTime,
+          requestMessage: r.requestMessage,
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadRequest();
   }, [id]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+
+    if (name === 'recipientDivision') {
+      fetchDistrictsByDivision(value);
+      setUpazilas([]);
+      setForm((prev) => ({
+        ...prev,
+        recipientDivision: value,
+        recipientDistrict: '',
+        recipientUpazila: '',
+      }));
+      return;
+    }
+
     if (name === 'recipientDistrict') {
       fetchUpazilas(value);
       setForm((prev) => ({ ...prev, recipientDistrict: value, recipientUpazila: '' }));
-    } else {
-      setForm((prev) => ({ ...prev, [name]: value }));
+      return;
     }
+
+    setForm((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSaving(true);
     try {
-      await api.put(`/donations/${id}`, form);
+      const { recipientDivision, ...payload } = form;
+      await api.put(`/donations/${id}`, payload);
       toast.success('Request updated successfully');
       navigate('/dashboard/my-donation-requests');
     } catch (err) {
@@ -80,18 +114,67 @@ const EditDonationRequest = () => {
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Recipient Name</label>
           <input name="recipientName" value={form.recipientName} onChange={handleChange} className="input-field" required />
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Recipient District</label>
-            <select name="recipientDistrict" value={form.recipientDistrict} onChange={handleChange} className="input-field" required>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              Recipient Division
+            </label>
+            <select
+              name="recipientDivision"
+              value={form.recipientDivision}
+              onChange={handleChange}
+              className="input-field"
+              required
+            >
+              <option value="">Select Division</option>
+              {divisions.map((div) => (
+                <option key={div.id} value={div.id}>{div.name}</option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label
+              className={`block text-sm font-medium mb-1 transition-colors duration-300 ${
+                form.recipientDivision ? 'text-gray-700 dark:text-gray-300' : 'text-gray-400 dark:text-gray-500'
+              }`}
+            >
+              Recipient District
+            </label>
+            <select
+              name="recipientDistrict"
+              value={form.recipientDistrict}
+              onChange={handleChange}
+              className={`input-field transition-all duration-300 ${
+                !form.recipientDivision ? 'input-field-cascade-locked' : ''
+              }`}
+              required
+              disabled={!form.recipientDivision}
+            >
+              <option value="">Select District</option>
               {districts.map((d) => (
                 <option key={d.id} value={d.name}>{d.name}</option>
               ))}
             </select>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Recipient Upazila</label>
-            <select name="recipientUpazila" value={form.recipientUpazila} onChange={handleChange} className="input-field" required>
+            <label
+              className={`block text-sm font-medium mb-1 transition-colors duration-300 ${
+                form.recipientDistrict ? 'text-gray-700 dark:text-gray-300' : 'text-gray-400 dark:text-gray-500'
+              }`}
+            >
+              Recipient Upazila
+            </label>
+            <select
+              name="recipientUpazila"
+              value={form.recipientUpazila}
+              onChange={handleChange}
+              className={`input-field transition-all duration-300 ${
+                !form.recipientDistrict ? 'input-field-cascade-locked' : ''
+              }`}
+              required
+              disabled={!form.recipientDistrict}
+            >
+              <option value="">Select Upazila</option>
               {upazilas.map((u) => (
                 <option key={u.id} value={u.name}>{u.name}</option>
               ))}
