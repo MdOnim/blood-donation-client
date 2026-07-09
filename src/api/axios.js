@@ -1,12 +1,13 @@
 import axios from 'axios';
 import toast from 'react-hot-toast';
+import { getAuthToken, clearAuthSession } from '../utils/authStorage';
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
 });
 
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('lifelink-token');
+  const token = getAuthToken();
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
@@ -26,8 +27,7 @@ api.interceptors.response.use(
       (code === 'ACCOUNT_RESTRICTED' || message === 'User account restricted.') &&
       !isAuthRequest
     ) {
-      localStorage.removeItem('lifelink-token');
-      localStorage.removeItem('lifelink-user');
+      clearAuthSession();
       toast.error('User account restricted.');
       window.location.href = '/login';
     }

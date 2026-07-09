@@ -21,6 +21,7 @@ const DonationTable = ({
   canEdit = true,
   canDelete = true,
   canChangeStatus = true,
+  ownerStatusActions = false,
   onStatusChange,
   onDelete,
   editPathPrefix = '/dashboard/edit-donation-request',
@@ -222,7 +223,7 @@ const DonationTable = ({
 
           {canChangeStatus && !isLocked && (
             <>
-              {openRequest.donationStatus === 'pending' && (
+              {!ownerStatusActions && openRequest.donationStatus === 'pending' && (
                 <button
                   type="button"
                   onClick={() => {
@@ -236,22 +237,19 @@ const DonationTable = ({
                 </button>
               )}
 
-              {(openRequest.donationStatus === 'pending' ||
-                openRequest.donationStatus === 'inprogress') && (
+              {openRequest.donationStatus === 'inprogress' && (
                 <>
-                  {openRequest.donationStatus === 'inprogress' && (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setOpenMenu(null);
-                        onStatusChange?.(openRequest._id, 'done');
-                      }}
-                      className={`${menuItemClass} text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20`}
-                    >
-                      <FaCheck className="shrink-0" />
-                      Mark Done
-                    </button>
-                  )}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setOpenMenu(null);
+                      onStatusChange?.(openRequest._id, 'done');
+                    }}
+                    className={`${menuItemClass} text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20`}
+                  >
+                    <FaCheck className="shrink-0" />
+                    Mark Done
+                  </button>
                   <button
                     type="button"
                     onClick={() => {
@@ -264,6 +262,20 @@ const DonationTable = ({
                     Cancel Request
                   </button>
                 </>
+              )}
+
+              {!ownerStatusActions && openRequest.donationStatus === 'pending' && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setOpenMenu(null);
+                    onStatusChange?.(openRequest._id, 'canceled');
+                  }}
+                  className={`${menuItemClass} text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20`}
+                >
+                  <FaTimes className="shrink-0" />
+                  Cancel Request
+                </button>
               )}
             </>
           )}

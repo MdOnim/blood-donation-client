@@ -9,7 +9,7 @@ import toast from 'react-hot-toast';
 const CreateDonationRequest = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const { divisions, districts, upazilas, fetchDistrictsByDivision, fetchUpazilas, setUpazilas } =
+  const { divisions, districts, upazilas, fetchDistrictsByDivision, fetchUpazilas, setUpazilas, setDistricts } =
     useLocations();
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({
@@ -29,8 +29,9 @@ const CreateDonationRequest = () => {
     const { name, value } = e.target;
 
     if (name === 'recipientDivision') {
-      fetchDistrictsByDivision(value);
+      setDistricts([]);
       setUpazilas([]);
+      fetchDistrictsByDivision(value);
       setForm((prev) => ({
         ...prev,
         recipientDivision: value,

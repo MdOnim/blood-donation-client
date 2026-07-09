@@ -80,7 +80,7 @@ const AdminHome = () => {
     <div className="space-y-8 max-w-6xl">
       <div>
         <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-gray-100">
-          Hello, <span className="text-primary capitalize">{user?.role}!</span>
+          Hello, <span className="text-primary">{user?.name?.split(' ')[0] || 'Admin'}!</span>
         </h2>
         <p className="text-gray-500 dark:text-gray-400 mt-2">
           {isAdmin

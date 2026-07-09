@@ -9,7 +9,7 @@ import { motion } from 'framer-motion';
 
 const Register = () => {
   const navigate = useNavigate();
-  const { divisions, districts, upazilas, fetchDistrictsByDivision, fetchUpazilas, setUpazilas } =
+  const { divisions, districts, upazilas, fetchDistrictsByDivision, fetchUpazilas, setUpazilas, setDistricts } =
     useLocations();
   const [loading, setLoading] = useState(false);
   const [imageUploading, setImageUploading] = useState(false);
@@ -30,8 +30,9 @@ const Register = () => {
     const { name, value } = e.target;
 
     if (name === 'division') {
-      fetchDistrictsByDivision(value);
+      setDistricts([]);
       setUpazilas([]);
+      fetchDistrictsByDivision(value);
       setForm((prev) => ({ ...prev, division: value, district: '', upazila: '' }));
       return;
     }

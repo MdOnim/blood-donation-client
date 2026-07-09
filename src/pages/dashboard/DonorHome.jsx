@@ -52,7 +52,7 @@ const DonorHome = () => {
     <div className="space-y-8 max-w-5xl">
       <div>
         <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-gray-100">
-          Hello, <span className="text-primary capitalize">{user?.role}!</span>
+          Hello, <span className="text-primary">{user?.name?.split(' ')[0] || 'Donor'}!</span>
         </h2>
         <p className="text-gray-500 dark:text-gray-400 mt-2">
           Manage your activities and help save lives today.
@@ -76,6 +76,7 @@ const DonorHome = () => {
           <DonationTable
             requests={recentRequests}
             showDonorInfo={false}
+            ownerStatusActions
             onStatusChange={handleStatusChange}
             onDelete={setDeleteTarget}
           />

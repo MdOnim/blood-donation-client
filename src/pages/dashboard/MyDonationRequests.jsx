@@ -76,6 +76,7 @@ const MyDonationRequests = () => {
           <>
             <DonationTable
               requests={requests}
+              ownerStatusActions
               onStatusChange={handleStatusChange}
               onDelete={setDeleteTarget}
             />

@@ -1,5 +1,13 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import api from '../api/axios';
+import {
+  getAuthToken,
+  getAuthUser,
+  setAuthSession,
+  setAuthUser,
+  clearAuthSession,
+  clearLegacyAuthStorage,
+} from '../utils/authStorage';
 
 const AuthContext = createContext(null);
 
@@ -8,25 +16,26 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem('lifelink-token');
-    const savedUser = localStorage.getItem('lifelink-user');
+    clearLegacyAuthStorage();
+
+    const token = getAuthToken();
+    const savedUser = getAuthUser();
+
     if (token && savedUser) {
-      setUser(JSON.parse(savedUser));
+      setUser(savedUser);
       api
         .get('/users/profile')
         .then((res) => {
           if (res.data.status === 'blocked') {
-            localStorage.removeItem('lifelink-token');
-            localStorage.removeItem('lifelink-user');
+            clearAuthSession();
             setUser(null);
             return;
           }
           setUser(res.data);
-          localStorage.setItem('lifelink-user', JSON.stringify(res.data));
+          setAuthUser(res.data);
         })
         .catch(() => {
-          localStorage.removeItem('lifelink-token');
-          localStorage.removeItem('lifelink-user');
+          clearAuthSession();
           setUser(null);
         })
         .finally(() => setLoading(false));
@@ -37,21 +46,19 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     const res = await api.post('/auth/login', { email, password });
-    localStorage.setItem('lifelink-token', res.data.token);
-    localStorage.setItem('lifelink-user', JSON.stringify(res.data.user));
+    setAuthSession(res.data.token, res.data.user);
     setUser(res.data.user);
     return res.data;
   };
 
   const logout = () => {
-    localStorage.removeItem('lifelink-token');
-    localStorage.removeItem('lifelink-user');
+    clearAuthSession();
     setUser(null);
   };
 
   const updateUser = (userData) => {
     setUser(userData);
-    localStorage.setItem('lifelink-user', JSON.stringify(userData));
+    setAuthUser(userData);
   };
 
   return (

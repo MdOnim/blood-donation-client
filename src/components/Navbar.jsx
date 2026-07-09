@@ -20,6 +20,15 @@ const Navbar = () => {
   const navLinks = (
     <>
       <NavLink
+        to="/search"
+        className={({ isActive }) =>
+          `font-medium transition-colors ${isActive ? 'text-primary' : 'text-gray-700 dark:text-gray-300 hover:text-primary'}`
+        }
+        onClick={() => setMobileOpen(false)}
+      >
+        Search Donors
+      </NavLink>
+      <NavLink
         to="/donation-requests"
         className={({ isActive }) =>
           `font-medium transition-colors ${isActive ? 'text-primary' : 'text-gray-700 dark:text-gray-300 hover:text-primary'}`

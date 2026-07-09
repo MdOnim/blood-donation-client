@@ -5,24 +5,27 @@ const useLocations = () => {
   const [divisions, setDivisions] = useState([]);
   const [districts, setDistricts] = useState([]);
   const [upazilas, setUpazilas] = useState([]);
-  const [loadingDistricts, setLoadingDistricts] = useState(true);
+  const [loadingDistricts, setLoadingDistricts] = useState(false);
 
   useEffect(() => {
     api.get('/locations/divisions').then((res) => setDivisions(res.data));
-    api
-      .get('/locations/districts')
-      .then((res) => setDistricts(res.data))
-      .finally(() => setLoadingDistricts(false));
   }, []);
 
   const fetchDistrictsByDivision = async (divisionId) => {
     if (!divisionId) {
-      const res = await api.get('/locations/districts');
-      setDistricts(res.data);
+      setDistricts([]);
       return;
     }
-    const res = await api.get(`/locations/districts?division=${divisionId}`);
-    setDistricts(res.data);
+
+    setLoadingDistricts(true);
+    try {
+      const res = await api.get(`/locations/districts?division=${divisionId}`);
+      setDistricts(res.data);
+    } catch {
+      setDistricts([]);
+    } finally {
+      setLoadingDistricts(false);
+    }
   };
 
   const fetchUpazilas = async (district) => {
@@ -30,8 +33,13 @@ const useLocations = () => {
       setUpazilas([]);
       return;
     }
-    const res = await api.get(`/locations/upazilas/${encodeURIComponent(district)}`);
-    setUpazilas(res.data);
+
+    try {
+      const res = await api.get(`/locations/upazilas/${encodeURIComponent(district)}`);
+      setUpazilas(res.data);
+    } catch {
+      setUpazilas([]);
+    }
   };
 
   return {
@@ -42,6 +50,7 @@ const useLocations = () => {
     fetchDistrictsByDivision,
     fetchUpazilas,
     setUpazilas,
+    setDistricts,
   };
 };
 

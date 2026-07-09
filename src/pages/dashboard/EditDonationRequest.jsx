@@ -34,6 +34,13 @@ const EditDonationRequest = () => {
           api.get('/locations/districts'),
         ]);
         const r = requestRes.data;
+
+        if (['done', 'canceled'].includes(r.donationStatus)) {
+          toast.error('Done or canceled requests cannot be edited');
+          navigate('/dashboard/my-donation-requests');
+          return;
+        }
+
         const district = districtsRes.data.find((d) => d.name === r.recipientDistrict);
         const divisionId = district?.division_id || '';
 
