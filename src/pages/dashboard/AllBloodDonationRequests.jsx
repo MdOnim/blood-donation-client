@@ -63,7 +63,9 @@ const AllBloodDonationRequests = () => {
           All <span className="text-primary">Requests</span>
         </h1>
         <p className="text-gray-500 dark:text-gray-400 mt-2">
-          View, edit, and manage all blood donation requests.
+          {isVolunteer
+            ? 'View donor requests and update their status.'
+            : 'View, edit, and manage all blood donation requests.'}
         </p>
       </div>
 

@@ -14,7 +14,8 @@ const pageTitles = {
   '/dashboard/my-donation-requests': 'My Requests',
   '/dashboard/create-donation-request': 'Create Request',
   '/dashboard/all-users': 'All Users',
-  '/dashboard/all-blood-donation-request': 'All Requests',
+  '/dashboard/all-blood-donation-request': 'Public Requests',
+  '/donation-requests': 'Public Requests',
 };
 
 const DashboardLayout = () => {
@@ -55,11 +56,18 @@ const DashboardLayout = () => {
       ],
     },
     {
-      title: 'Admin',
+      title: 'Donations',
+      links: [
+        { to: '/dashboard/my-donation-requests', icon: FaList, label: 'My Requests' },
+        { to: '/dashboard/create-donation-request', icon: FaPlus, label: 'Create Request' },
+        { to: '/funding', icon: FaHandHoldingHeart, label: 'Funding' },
+      ],
+    },
+    {
+      title: 'Management',
       links: [
         { to: '/dashboard/all-users', icon: FaUsers, label: 'All Users' },
-        { to: '/dashboard/all-blood-donation-request', icon: FaTint, label: 'All Requests' },
-        { to: '/funding', icon: FaHandHoldingHeart, label: 'Funding' },
+        { to: '/dashboard/all-blood-donation-request', icon: FaTint, label: 'Public Requests' },
       ],
     },
   ];
@@ -75,8 +83,15 @@ const DashboardLayout = () => {
     {
       title: 'Donations',
       links: [
-        { to: '/dashboard/all-blood-donation-request', icon: FaTint, label: 'All Requests' },
+        { to: '/dashboard/my-donation-requests', icon: FaList, label: 'My Requests' },
+        { to: '/dashboard/create-donation-request', icon: FaPlus, label: 'Create Request' },
         { to: '/funding', icon: FaHandHoldingHeart, label: 'Funding' },
+      ],
+    },
+    {
+      title: 'Management',
+      links: [
+        { to: '/dashboard/all-blood-donation-request', icon: FaTint, label: 'Public Requests' },
       ],
     },
   ];
@@ -95,7 +110,7 @@ const DashboardLayout = () => {
   const navLinkClass = ({ isActive }) =>
     `flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${
       isActive
-        ? 'bg-rose-50 dark:bg-rose-900/20 text-primary'
+        ? 'bg-primary text-white shadow-sm'
         : 'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white'
     }`;
 

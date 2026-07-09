@@ -22,7 +22,9 @@ const Login = () => {
       toast.success('Welcome back!');
       navigate(from, { replace: true });
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Login failed');
+      toast.error(err.response?.data?.message || 'Login failed', {
+        icon: '❗️',
+      });
     } finally {
       setLoading(false);
     }

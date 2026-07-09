@@ -1,4 +1,5 @@
 import axios from 'axios';
+import toast from 'react-hot-toast';
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
@@ -11,5 +12,28 @@ api.interceptors.request.use((config) => {
   }
   return config;
 });
+
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    const status = error.response?.status;
+    const code = error.response?.data?.code;
+    const message = error.response?.data?.message;
+    const isAuthRequest = error.config?.url?.includes('/auth/login');
+
+    if (
+      status === 403 &&
+      (code === 'ACCOUNT_RESTRICTED' || message === 'User account restricted.') &&
+      !isAuthRequest
+    ) {
+      localStorage.removeItem('lifelink-token');
+      localStorage.removeItem('lifelink-user');
+      toast.error('User account restricted.');
+      window.location.href = '/login';
+    }
+
+    return Promise.reject(error);
+  }
+);
 
 export default api;

@@ -15,6 +15,12 @@ export const AuthProvider = ({ children }) => {
       api
         .get('/users/profile')
         .then((res) => {
+          if (res.data.status === 'blocked') {
+            localStorage.removeItem('lifelink-token');
+            localStorage.removeItem('lifelink-user');
+            setUser(null);
+            return;
+          }
           setUser(res.data);
           localStorage.setItem('lifelink-user', JSON.stringify(res.data));
         })
