@@ -4,61 +4,72 @@ A modern, responsive blood donation platform built with React that connects dono
 
 ## Deployment
 
-### 1) Deploy server (Render)
+Deploy both the **server** and **client** on [Vercel](https://vercel.com) — one account, no Render needed.
 
-1. Go to [render.com](https://render.com) and sign in with GitHub.
-2. Click **New +** → **Blueprint** (or **Web Service**).
-3. Connect repo: `MdOnim/blood-donation-server`.
-4. If using Blueprint, Render reads `render.yaml` automatically.
-5. Add these environment variables in Render:
+### 1) MongoDB Atlas (one-time)
+
+1. In [MongoDB Atlas](https://cloud.mongodb.com) → **Network Access** → add `0.0.0.0/0` so Vercel can connect.
+2. Copy your Atlas connection string for `MONGODB_URI`.
+
+### 2) Deploy server on Vercel
+
+1. Go to [vercel.com](https://vercel.com) → sign in with GitHub.
+2. **Add New Project** → import `MdOnim/blood-donation-server`.
+3. Framework: **Other** (Express API).
+4. Root directory: leave as `.` (repo root).
+5. Add environment variables:
 
 ```
 MONGODB_URI=your_mongodb_atlas_uri
 JWT_SECRET=your_long_random_secret
 STRIPE_SECRET_KEY=sk_test_your_key
-CLIENT_URL=https://your-vercel-app.vercel.app
+CLIENT_URL=https://your-client-app.vercel.app
 ```
 
-6. Deploy and copy your server URL, e.g. `https://blood-donation-server.onrender.com`.
-7. In Render **Shell**, run once after first deploy:
+Use a placeholder for `CLIENT_URL` for now; update it after the client deploys.
+
+6. Deploy and copy your server URL, e.g. `https://blood-donation-server.vercel.app`.
+
+### 3) Seed admin (run once from your PC)
+
+In the `server` folder, make sure `.env` has your **production** `MONGODB_URI`, then run:
 
 ```bash
 npm run seed:admin
 ```
 
-8. In MongoDB Atlas → **Network Access**, allow `0.0.0.0/0` so Render can connect.
+Admin login: `admin@lifelink.com` / `Admin@123`
 
-### 2) Deploy client (Vercel)
+### 4) Deploy client on Vercel
 
-1. Go to [vercel.com](https://vercel.com) and sign in with GitHub.
-2. **Add New Project** → import `MdOnim/blood-donation-client`.
-3. Framework preset: **Vite**.
-4. Add environment variables:
+1. **Add New Project** → import `MdOnim/blood-donation-client`.
+2. Framework preset: **Vite**.
+3. Add environment variables:
 
 ```
-VITE_API_URL=https://your-render-server.onrender.com/api
+VITE_API_URL=https://your-server-app.vercel.app/api
 VITE_STRIPE_PUBLISHABLE_KEY=pk_test_your_key
 VITE_IMGBB_API_KEY=your_imgbb_key
 ```
 
-5. Deploy and copy your Vercel URL.
+4. Deploy and copy your client URL, e.g. `https://blood-donation-client.vercel.app`.
 
-### 3) Final step (important)
+### 5) Final step (important)
 
-Go back to Render and update:
+Go back to the **server** project on Vercel → **Settings → Environment Variables**:
 
 ```
-CLIENT_URL=https://your-vercel-app.vercel.app
+CLIENT_URL=https://your-client-app.vercel.app
 ```
 
-Then redeploy the server so CORS allows your live frontend.
+Redeploy the server so Stripe redirects and CORS use the correct frontend URL.
 
-### 4) Test live site
+### 6) Test live site
 
 - Register / login
 - Create donation request
 - Search requests
-- Stripe funding test payment
+- Stripe funding (test card: `4242 4242 4242 4242`)
 - Admin login: `admin@lifelink.com` / `Admin@123`
 
 ## Live URL
