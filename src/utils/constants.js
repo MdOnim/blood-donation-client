@@ -67,22 +67,28 @@ const resizeImageFile = (file, maxWidth = 512, quality = 0.82) =>
   });
 
 export const uploadImageToImgBB = async (file) => {
-  if (!isImgBBConfigured()) {
-    if (file.size > 5 * 1024 * 1024) {
-      throw new Error('Image must be smaller than 5MB');
-    }
-    return resizeImageFile(file);
+  if (file.size > 5 * 1024 * 1024) {
+    throw new Error('Image must be smaller than 5MB');
   }
 
-  const formData = new FormData();
-  formData.append('image', file);
-  const response = await fetch(
-    `https://api.imgbb.com/1/upload?key=${import.meta.env.VITE_IMGBB_API_KEY}`,
-    { method: 'POST', body: formData }
-  );
-  const data = await response.json();
-  if (!data.success) {
-    throw new Error(data.error?.message || 'Image upload failed');
+  // Prefer ImgBB when configured; fall back to resized data URL if blocked/fails
+  if (isImgBBConfigured()) {
+    try {
+      const formData = new FormData();
+      formData.append('image', file);
+      const response = await fetch(
+        `https://api.imgbb.com/1/upload?key=${import.meta.env.VITE_IMGBB_API_KEY}`,
+        { method: 'POST', body: formData }
+      );
+      const data = await response.json();
+      if (data.success && data.data?.url) {
+        return data.data.url;
+      }
+      console.warn('ImgBB upload failed, using local image fallback:', data.error?.message);
+    } catch (err) {
+      console.warn('ImgBB upload error, using local image fallback:', err.message);
+    }
   }
-  return data.data.url;
+
+  return resizeImageFile(file);
 };
